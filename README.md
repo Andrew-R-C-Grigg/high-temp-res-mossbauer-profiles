@@ -1,8 +1,6 @@
 # high-temp-res-mossbauer-profiles
 Nussbaum: Code to collect and analyse high temperature-resolution Mössbauer spectroscopy profiles
 
-High temperature-resolution Mössbauer profile analysis
-
 Status: Under Development / Pre-publication
 
 
