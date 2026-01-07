@@ -14,7 +14,7 @@ Repository Content
 
 Currently, this repository is a placeholder. Upon publication of the accompanying article, it will be updated to include:
 
-    Scripts: Python code used for data processing.
+    Scripts: Python code used for data collection and data processing.
 
     Documentation: Instructions for reproducing the analysis.
 
