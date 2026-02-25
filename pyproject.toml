@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Nussbaum"
+description = "Automated high-resolution Mössbauer spectroscopy temperature profile measurements"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache 2.0 License",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "sklearn"
+    "matplotlib",
+    "pandas",
+    "pywinauto",
+    "lakeshore"
+    "comtypes",
+    "pyserial",
+    "joblib",
+    "scikit-learn",
+    "tqdm",
+    "openpyxl",
+    "glob"
+]
+
+
+[tool.setuptools.packages.find]
+where = ["."]
