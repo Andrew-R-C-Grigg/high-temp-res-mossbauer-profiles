@@ -3,7 +3,6 @@
 Created on Fri Jan  5 15:29:19 2024
 
 Functions to be used for the fitting of Mössbuer spectral models
-"""
 
 Nussbaum - a python package for automated high-resolution Mössbauer spectroscopy temperature profile measurements
 
@@ -11,6 +10,8 @@ Nussbaum - a python package for automated high-resolution Mössbauer spectroscop
 *ETH Zurich, Department of Environmental System Science, Institute for Biogeochemistry and Pollutant Dynamics
 
 License: Apache 2.0 (http://www.apache.org/licenses/)
+
+"""
 
 import numpy as np
 from nussbaum.utils import s2n
