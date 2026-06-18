@@ -424,9 +424,9 @@ def plot_asnr_with_fit(ax, data_path, cal, title, c, T):
 
 
 # --- Configuration ---
-DATA_DIR_5 = r"T:\3_Experimental Data\2403_Hönggerberg_microsites\Mössbauer\Initial minerals\57Fe-2L-Fh\5K_spectra-every-second"
-DATA_DIR_75 = r"T:\3_Experimental Data\2403_Hönggerberg_microsites\Mössbauer\Initial minerals\57Fe-2L-Fh\75K_spectra-every-second"
-CAL_FILE = r"T:\3_Experimental Data\2403_Hönggerberg_microsites\Mössbauer\Initial minerals\57Fe-2L-Fh\250624_v12.dat" 
+DATA_DIR_5 = r"..\Data\2L-Fh\5K_spectra-every-30second"
+DATA_DIR_75 = r"..\Data\2L-Fh\75K_spectra-every-30second"
+CAL_FILE = r"..\Data\2L-Fh\250624_v12.dat" 
 cal = fold.calibrate(calpath=CAL_FILE, plots_on=False)
 
 plot_asnr_with_fit(ax6, DATA_DIR_5, cal, "SNR evolution (5K)", 'red', '5 K')
