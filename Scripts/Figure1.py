@@ -169,7 +169,7 @@ def load_files(file_paths, calfile_path):
 # MAIN SCRIPT
 # =============================================================================
 
-base_path = r"T:\3_Experimental Data\2403_Hönggerberg_microsites\Mössbauer\Initial minerals\57Fe-2L-Fh"
+base_path = r"..Data/2L-Fh/"
 MATRIX_DATA_FOLDER = os.path.join(base_path, "profile")
 STACK_DATA_FOLDER = os.path.join(base_path, "high_SNR_spectra")
 CALIBRATION_FILE_PATH = os.path.join(base_path, "250624_v12.dat") 
