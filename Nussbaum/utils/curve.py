@@ -1016,13 +1016,13 @@ def collapsed_static(x,
     for T_Block_val in T_Block_dist[1:-1]:  
         fail = False
         try:
-            B = abs(float(Temp_H(T_measured, T_Block_val, B_sat, B_sat - 5, nu, J=2.5)))
+            B = abs(float(Temp_H(T_measured, T_Block_val, B_sat, B_sat - 5, nu)))
             B_Temp_dist.append(B)
         except:
             fail = True
         if fail:
             try:
-                B = abs(float(Temp_H(T_measured, T_Block_val, B_sat, 5, nu, J=2.5)))
+                B = abs(float(Temp_H(T_measured, T_Block_val, B_sat, 5, nu)))
                 B_Temp_dist.append(B)
             except:
                 B_Temp_dist.append(np.nan)
@@ -1155,10 +1155,10 @@ def collapsed_wickman(x,
         
         # Calculate H-field for this particle
         try:
-            H = abs(float(Temp_H(T_measured, T_B_particle, B_sat, B_sat - 5, nu, J=2.5)))
+            H = abs(float(Temp_H(T_measured, T_B_particle, B_sat, B_sat - 5, nu)))
         except RuntimeError:
             try:
-                H = abs(float(Temp_H(T_measured, T_B_particle, B_sat, 5, nu, J=2.5)))
+                H = abs(float(Temp_H(T_measured, T_B_particle, B_sat, 5, nu)))
             except RuntimeError:
                 H = np.nan # Particle calculation failed
         
@@ -1304,14 +1304,14 @@ def collapsed_blume(x,
         fail = False
         try:
             # Attempt 1: Guess near saturation (B_sat - 5)
-            H_particle = abs(float(Temp_H(T_measured, T_B_particle, B_sat, B_sat - 5, nu, J=2.5)))
+            H_particle = abs(float(Temp_H(T_measured, T_B_particle, B_sat, B_sat - 5, nu)))
         except:
             fail = True
         
         if fail:
             try:
                 # Attempt 2: Guess low (5)
-                H_particle = abs(float(Temp_H(T_measured, T_B_particle, B_sat, 5, nu, J=2.5)))
+                H_particle = abs(float(Temp_H(T_measured, T_B_particle, B_sat, 5, nu)))
             except:
                 # Attempt 3: Failed to converge, assume collapsed (0.0)
                 H_particle = 0.0      
