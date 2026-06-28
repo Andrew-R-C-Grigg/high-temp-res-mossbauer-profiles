@@ -194,8 +194,7 @@ def sextet_VBF(x,CS,epsilon,H,sigma=0,intensity=30000,counts=0):
     '''
     
     gamma=0.139627911023937
-    # sigma=0.5*sigma # I am not sure why this is necessary
-    sigma=1.0*sigma # I am not sure why this is necessary
+    sigma=1.0*sigma 
 
 
     mun=3.1524512605e-8 #ev/T
@@ -374,8 +373,8 @@ def sextet_xVBF_relax(x,CS,epsilon,H,sigma_CS=0,sigma_ep=0,sigma_H=0,intensity=3
        
     gamma2=gamma*2 # convert to FWHM
     
-    Max_L2=0.8
-    Max_L3=1.0
+Max_L2=10
+    Max_L3=15
     L1=gamma2
     L2=2*gamma + A * W_relax
     if L2 > Max_L2: L2 = Max_L2
@@ -384,36 +383,36 @@ def sextet_xVBF_relax(x,CS,epsilon,H,sigma_CS=0,sigma_ep=0,sigma_H=0,intensity=3
     
     # p1
     x1 = 0 + CS + epsilon - ((Z + 3) * (z / 2))
-    LorAmp1 = (3/12)*intensity/(np.pi*gamma2)
+    LorAmp1 = (3/12)*intensity/(np.pi*L1)
     p1 = voigt_byrne(x, x1, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L1, LorAmp1)
 
     # p2
     x2 = 0 + CS - epsilon - ((Z + 1) * (z / 2))
-    LorAmp2 = (2/12)*intensity/(np.pi*gamma2)
+    LorAmp2 = (2/12)*intensity/(np.pi*L2)
     p2 = voigt_byrne(x, x2, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L2, LorAmp2)
 
     # p3
     x3 = 0 + CS - epsilon - ((Z - 1) * (z / 2))
-    LorAmp3 = (1/12)*intensity/(np.pi*gamma2)
+    LorAmp3 = (1/12)*intensity/(np.pi*L3)
     p3 = voigt_byrne(x, x3, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L3, LorAmp3)
 
     # p4
     x4 = 0 + CS - epsilon + ((Z - 1) * (z / 2))
-    LorAmp4 = (1/12)*intensity/(np.pi*gamma2)
+    LorAmp4 = (1/12)*intensity/(np.pi*L3)
     p4 = voigt_byrne(x, x4, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L3, LorAmp4)
 
     # p5
     x5 = 0 + CS - epsilon + ((Z + 1) * (z / 2))
-    LorAmp5 = (2/12)*intensity/(np.pi*gamma2)
+    LorAmp5 = (2/12)*intensity/(np.pi*L2)
     p5 = voigt_byrne(x, x5, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L2, LorAmp5)
 
     # p6
     x6 = 0 + CS + epsilon + ((Z + 3) * (z / 2))
-    LorAmp6 = (3/12)*intensity/(np.pi*gamma2)
+    LorAmp6 = (3/12)*intensity/(np.pi*L1)
     p6 = voigt_byrne(x, x6, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L1, LorAmp6)
     
     y=counts+(p1+p2+p3+p4+p5+p6)
-    return (y)    
+    return (y)   
 
 #%%
 
@@ -1141,14 +1140,14 @@ def collapsed_wickman(x,
 
     f0 = 10**log10_f0
     k_B = constants.Boltzmann  # J/K (1.3806e-23)
-    CONV_FACTOR_HZ_TO_MMS = 4.605e-7 
+    CONV_FACTOR_RADS_TO_MMS = 8.605e-8 / (2 * np.pi) 
     f_factor_temp = calculate_f_factor(T_measured, thD) 
     MOSStime = 1e-8
     E_barrier_ratio = np.log(f0 * MOSStime)
     
     # Get the distribution of particle blocking temperatures
     T_Block_dist = Temp_distribution(T_Block, sig_T_Block, res=sigTB_res)
-    sext, doub = [], []
+    sext, doub, all_slices = [], [], []
 
     # We loop one over the T_Block distribution. For each particle, we calculate H and W_relax. 
     for T_B_particle in T_Block_dist[1:-1]: # Using your [1:-1] slice
@@ -1168,7 +1167,7 @@ def collapsed_wickman(x,
         # Calculate W_relax (dynamic broadening)
         E_B = E_barrier_ratio * k_B * T_B_particle
         Gamma_relax_Hz = f0 * np.exp(-E_B / (k_B * T_measured))
-        W_relax_mms = Gamma_relax_Hz * CONV_FACTOR_HZ_TO_MMS
+        W_relax_mms = Gamma_relax_Hz * CONV_FACTOR_RADS_TO_MMS
 
         # H=0 is a doublet
         if H > 1e-5:
@@ -1179,7 +1178,7 @@ def collapsed_wickman(x,
             epsilon = (calculate_QS(thD, T_measured, QS_nought) * (3 * np.cos(theta) ** 2 -1)) / (4)
                     
             # Call relax-aware sextet function
-            sext.append(np.array(sextet_xVBF_relax(x,
+            slice_shape=np.array(sextet_xVBF_relax(x,
                                  CS=cs,
                                  epsilon=epsilon,
                                  H=H,
@@ -1190,32 +1189,45 @@ def collapsed_wickman(x,
                                  W_relax=W_relax_mms,
                                  A=A,
                                  B=B
-                                )))
+                                ))
             
-            doub.append(np.ones(len(x))) # Add placeholder for averaging
+            sext.append(slice_shape)
+            doub.append(np.nan *np.ones(len(x))) # Add placeholder for averaging
+            
+            all_slices.append(slice_shape)
 
         else:
             # DOUBLET PATH
             cs = calculate_CS(thD, T_measured, del1)
             qs = calculate_QS(thD, T_measured, QS_nought)
             
-            doub.append(np.array(doublet_xVBF_relax(x,
+            slice_shape=np.array(doublet_xVBF_relax(x,
                                  CS=cs,
                                  QS=qs,
                                  sigma_QS=sigma_QS, 
                                  intensity=intensity * f_factor_temp, 
                                  counts=counts,
                                  W_relax=W_relax_mms, C=C
-                                )))
+                                ))
             
-            sext.append(np.ones(len(x))) # Add placeholder for averaging
+            doub.append(slice_shape)
+            
+            sext.append(np.nan *np.ones(len(x))) # Add placeholder for averaging
+            
+            all_slices.append(slice_shape)
 
     # Final Averaging
-    sext_mean = np.nanmean(sext, axis=0)
-    doub_mean = np.nanmean(doub, axis=0)
+    with warnings.catch_warnings():
+        # This tells Python to completely ignore any RuntimeWarning inside this block
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        sext_mean = np.nanmean(sext, axis=0)
+        doub_mean = np.nanmean(doub, axis=0)
+    
+    if np.any(np.isnan(sext_mean)): sext_mean = np.ones_like(x)
+    if np.any(np.isnan(doub_mean)): doub_mean = np.ones_like(x)  
     
     # Combine components by multiplication (correct for transmission spectra)
-    collapsed_spectrum = sext_mean * doub_mean 
+    collapsed_spectrum = np.nanmean(all_slices, axis=0)
 
     return collapsed_spectrum, sext_mean, doub_mean
 
@@ -1239,7 +1251,7 @@ def collapsed_blume(x,
                       linewidth_L=0.135,
                       H_STEPS=15,    
                       EPS_STEPS=15,
-                      sigTB_res=100,
+                      sigTB_res=50,
                      ):
     """
     Generates a collapsed Mössbauer spectrum at the interface between doublet and sextet.
@@ -1334,8 +1346,8 @@ def collapsed_blume(x,
         E_B = ENERGY_BARRIER_RATIO * k_B * T_B_particle 
         Gamma_relax_Hz = f0 * np.exp(-E_B / (k_B * T_measured))
         
-        HZ_TO_MMS = 8.605e-8
-        Gamma_relax_mms = Gamma_relax_Hz * HZ_TO_MMS
+        CONV_FACTOR_RADS_TO_MMS = 8.605e-8 / (2 * np.pi) 
+        Gamma_relax_mms = Gamma_relax_Hz * CONV_FACTOR_RADS_TO_MMS 
 
         # Cap the mm/s value, not the Hz value.
         # A cap of 10,000 mm/s is more than enough for full collapse.
@@ -1344,7 +1356,7 @@ def collapsed_blume(x,
         # 1. Call the Blume engine to get a raw ABSORPTION shape
         absorption_shape = extended_blume_tjon(
             x_values=x, 
-            CS_mean=cs, sigma_CS=sigma_CS, # sigma_CS is handled INSIDE
+            CS_mean=cs, sigma_CS=sigma_CS, 
             QS=QS_for_blume, sigma_QS=sigQS, 
             H=H_particle,
             sigma_H=current_sigma_H,
@@ -1358,7 +1370,7 @@ def collapsed_blume(x,
         total_absorption = absorption_shape * effective_area
         spectrum_slice = np.exp(-total_absorption)
 
-        # 'dynamic_spectra' is now a clean list of *only* transmission spectra
+        # 'dynamic_spectra' is a clean list of transmission spectra
         dynamic_spectra.append(spectrum_slice)
         
         if T_B_particle<0.01:
@@ -1369,17 +1381,25 @@ def collapsed_blume(x,
         if is_doublet:
             doublet_shapes.append(spectrum_slice)
             do.append(1)
-            sextet_shapes.append(np.ones_like(x)) # Identity for multiplication
+            sextet_shapes.append(np.nan *np.ones_like(x)) # Identity for multiplication
         else:
             sextet_shapes.append(spectrum_slice)
             se.append(1)
-            doublet_shapes.append(np.ones_like(x)) # Identity for multiplication
+            doublet_shapes.append(np.nan *np.ones_like(x)) # Identity for multiplication
         
-    # Combine components by multiplication
-    collapsed_spectrum = np.nanmean(dynamic_spectra, axis=0)
+    # Combine components
+    with warnings.catch_warnings():
+        # This tells Python to completely ignore any RuntimeWarning inside this block
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        collapsed_spectrum = np.nanmean(dynamic_spectra, axis=0)
+        sext_mean = np.nanmean(sextet_shapes, axis=0)
+        doub_mean = np.nanmean(doublet_shapes, axis=0)
+    
+    if np.any(np.isnan(sext_mean)): sext_mean = np.ones_like(x)
+    if np.any(np.isnan(doub_mean)): doub_mean = np.ones_like(x)    
+    
     sys.stdout.flush()
-    return collapsed_spectrum, np.nanmean(sextet_shapes, axis=0), np.nanmean(doublet_shapes, axis=0)
-
+    return collapsed_spectrum, sext_mean, doub_mean
 #%%
 
 def _generate_spectrum_for_temp(temp, x, collapsed_func, **kwargs): 
