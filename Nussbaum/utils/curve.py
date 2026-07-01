@@ -809,7 +809,7 @@ def Temp_H(Temp, T_Block, B_sat, B_Temp_init_input, nu):
     Brillouin equation self-consistently.
 
     Since the internal magnetic field in the Brillouin function depends on the 
-    magnetization itself (Mean Field Theory), this function uses a fixed-point 
+    magnetisation itself (Mean Field Theory), this function uses a fixed-point 
     iteration method to find the stable solution for B at a given Temperature.
 
     Parameters
@@ -859,7 +859,7 @@ def Temp_H(Temp, T_Block, B_sat, B_Temp_init_input, nu):
    
 def Temp_distribution(T_Block,T_B_sigma,res=100):
     """
-    Generates a discretized Gaussian distribution of Blocking Temperatures (T_Block).
+    Generates a discretised Gaussian distribution of Blocking Temperatures (T_Block).
 
     This function creates a range of T_Block values sampled from a normal distribution
     defined by a mean (`T_Block`) and standard deviation (`T_B_sigma`). It uses 
@@ -1189,11 +1189,9 @@ def collapsed_wickman(x,
                                  W_relax=W_relax_mms,
                                  A=A,
                                  B=B
-                                ))
-            
+                                ))    
             sext.append(slice_shape)
-            doub.append(np.nan *np.ones(len(x))) # Add placeholder for averaging
-            
+            doub.append(np.nan *np.ones(len(x))) # Add placeholder for averaging          
             all_slices.append(slice_shape)
 
         else:
@@ -1209,11 +1207,8 @@ def collapsed_wickman(x,
                                  counts=counts,
                                  W_relax=W_relax_mms, C=C
                                 ))
-            
-            doub.append(slice_shape)
-            
+            doub.append(slice_shape) 
             sext.append(np.nan *np.ones(len(x))) # Add placeholder for averaging
-            
             all_slices.append(slice_shape)
 
     # Final Averaging
