@@ -34,7 +34,7 @@ from scipy.signal import convolve
 import math
 import matplotlib.pyplot as plt
 
-def voigt_byrne(phi, w0, sigma, gamma, h):
+def voigt(phi, w0, sigma, gamma, h):
     
     '''
     Numercal approximation of a Voigt based peak.
@@ -93,11 +93,11 @@ def doublet_VBF(x,CS,QS,sigma=0,intensity=30000,counts=1):
     
     # p1
     x1 = 0 + CS -0.5*QS
-    p1 = voigt_byrne(x, x1, sigma, gamma, intensity*0.5/(np.pi*2*gamma)) 
+    p1 = voigt(x, x1, sigma, gamma, intensity*0.5/(np.pi*2*gamma)) 
 
     # p2
     x2 = 0 + CS +0.5*QS
-    p2 = voigt_byrne(x, x2, sigma, gamma, intensity*0.5/(np.pi*2*gamma))
+    p2 = voigt(x, x2, sigma, gamma, intensity*0.5/(np.pi*2*gamma))
 
     y=counts-(-1*(p1+p2))
     return (y)
@@ -131,11 +131,11 @@ def doublet_xVBF(x,CS,QS,sigma_CS=0,sigma_QS=0,intensity=30000,counts=1):
    
     # p1
     x1 = 0 + CS -0.5*QS
-    p1 = voigt_byrne(x, x1, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), gamma, intensity*0.5/(np.pi*2*gamma)) 
+    p1 = voigt(x, x1, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), gamma, intensity*0.5/(np.pi*2*gamma)) 
 
     # p2
     x2 = 0 + CS +0.5*QS
-    p2 = voigt_byrne(x, x2, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), gamma, intensity*0.5/(np.pi*2*gamma))
+    p2 = voigt(x, x2, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), gamma, intensity*0.5/(np.pi*2*gamma))
 
     y=counts-(-1*(p1+p2))
     return (y)
@@ -166,11 +166,11 @@ def doublet_xVBF_relax(x,CS,QS,sigma_CS=0,sigma_QS=0,intensity=30000,counts=1, W
     
     # p1
     x1 = 0 + CS -0.5*QS
-    p1 = voigt_byrne(x, x1, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), L4, intensity*0.5/(np.pi*2*L4)) 
+    p1 = voigt(x, x1, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), L4, intensity*0.5/(np.pi*2*L4)) 
 
     # p2
     x2 = 0 + CS +0.5*QS
-    p2 = voigt_byrne(x, x2, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), L4, intensity*0.5/(np.pi*2*L4))
+    p2 = voigt(x, x2, np.sqrt((sigma_QS/2)**2 + sigma_CS**2), L4, intensity*0.5/(np.pi*2*L4))
 
     y=counts-(-1*(p1+p2))
     return (y)
@@ -221,32 +221,32 @@ def sextet_VBF(x,CS,epsilon,H,sigma=0,intensity=30000,counts=0):
     # p1
     x1 = 0 + CS + epsilon - ((Z + 3) * (z / 2))
     LorAmp1 = (3/12)*intensity/(np.pi*gamma2)
-    p1 = voigt_byrne(x, x1, np.abs((Z+3)*(1/2)*sig), gamma, LorAmp1)
+    p1 = voigt(x, x1, np.abs((Z+3)*(1/2)*sig), gamma, LorAmp1)
 
     # p2
     x2 = 0 + CS - epsilon - ((Z + 1) * (z / 2))
     LorAmp2 = (2/12)*intensity/(np.pi*gamma2)
-    p2 = voigt_byrne(x, x2, np.abs((Z+1)*(1/2)*sig), gamma, LorAmp2)
+    p2 = voigt(x, x2, np.abs((Z+1)*(1/2)*sig), gamma, LorAmp2)
 
     # p3
     x3 = 0 + CS - epsilon - ((Z - 1) * (z / 2))
     LorAmp3 = (1/12)*intensity/(np.pi*gamma2)
-    p3 = voigt_byrne(x, x3, np.abs((Z-1)*(1/2)*sig), gamma, LorAmp3)
+    p3 = voigt(x, x3, np.abs((Z-1)*(1/2)*sig), gamma, LorAmp3)
 
     # p4
     x4 = 0 + CS - epsilon + ((Z - 1) * (z / 2))
     LorAmp4 = (1/12)*intensity/(np.pi*gamma2)
-    p4 = voigt_byrne(x, x4, np.abs((Z-1)*(1/2)*sig), gamma, LorAmp4)
+    p4 = voigt(x, x4, np.abs((Z-1)*(1/2)*sig), gamma, LorAmp4)
 
     # p5
     x5 = 0 + CS - epsilon + ((Z + 1) * (z / 2))
     LorAmp5 = (2/12)*intensity/(np.pi*gamma2)
-    p5 = voigt_byrne(x, x5, np.abs((Z+1)*(1/2)*sig), gamma, LorAmp5)
+    p5 = voigt(x, x5, np.abs((Z+1)*(1/2)*sig), gamma, LorAmp5)
 
     # p6
     x6 = 0 + CS + epsilon + ((Z + 3) * (z / 2))
     LorAmp6 = (3/12)*intensity/(np.pi*gamma2)
-    p6 = voigt_byrne(x, x6, np.abs((Z+3)*(1/2)*sig), gamma, LorAmp6)
+    p6 = voigt(x, x6, np.abs((Z+3)*(1/2)*sig), gamma, LorAmp6)
     
     y=counts+((p1+p2+p3+p4+p5+p6
                          ))
