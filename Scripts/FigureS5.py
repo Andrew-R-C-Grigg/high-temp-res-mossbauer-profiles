@@ -58,9 +58,9 @@ temp_to_plot='55'
 fig, ax = plt.subplots(figsize=(6,10))
 for e,(folder,title) in enumerate(zip(
         [
-    "2Lc_Fh",
-    "2L_Fh",
-    "6L_Fh"
+    "2Lc-Fh",
+    "2L-Fh",
+    "6L-Fh"
             ],
     [
     "2Lc Ferrihydrite",
