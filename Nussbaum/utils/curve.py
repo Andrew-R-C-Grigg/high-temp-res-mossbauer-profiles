@@ -300,32 +300,32 @@ def sextet_xVBF(x,CS,epsilon,H,sigma_CS=0,sigma_ep=0,sigma_H=0,intensity=30000,c
     # p1
     x1 = 0 + CS + epsilon - ((Z + 3) * (z / 2))
     LorAmp1 = (3/12)*intensity/(np.pi*gamma2)
-    p1 = voigt_byrne(x, x1, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp1)
+    p1 = voigt(x, x1, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp1)
 
     # p2
     x2 = 0 + CS - epsilon - ((Z + 1) * (z / 2))
     LorAmp2 = (2/12)*intensity/(np.pi*gamma2)
-    p2 = voigt_byrne(x, x2, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp2)
+    p2 = voigt(x, x2, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp2)
 
     # p3
     x3 = 0 + CS - epsilon - ((Z - 1) * (z / 2))
     LorAmp3 = (1/12)*intensity/(np.pi*gamma2)
-    p3 = voigt_byrne(x, x3, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp3)
+    p3 = voigt(x, x3, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp3)
 
     # p4
     x4 = 0 + CS - epsilon + ((Z - 1) * (z / 2))
     LorAmp4 = (1/12)*intensity/(np.pi*gamma2)
-    p4 = voigt_byrne(x, x4, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp4)
+    p4 = voigt(x, x4, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp4)
 
     # p5
     x5 = 0 + CS - epsilon + ((Z + 1) * (z / 2))
     LorAmp5 = (2/12)*intensity/(np.pi*gamma2)
-    p5 = voigt_byrne(x, x5, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp5)
+    p5 = voigt(x, x5, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp5)
 
     # p6
     x6 = 0 + CS + epsilon + ((Z + 3) * (z / 2))
     LorAmp6 = (3/12)*intensity/(np.pi*gamma2)
-    p6 = voigt_byrne(x, x6, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp6)
+    p6 = voigt(x, x6, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), gamma2, LorAmp6)
     
     y=counts+(p1+p2+p3+p4+p5+p6
                          )
@@ -384,32 +384,32 @@ Max_L2=10
     # p1
     x1 = 0 + CS + epsilon - ((Z + 3) * (z / 2))
     LorAmp1 = (3/12)*intensity/(np.pi*L1)
-    p1 = voigt_byrne(x, x1, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L1, LorAmp1)
+    p1 = voigt(x, x1, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L1, LorAmp1)
 
     # p2
     x2 = 0 + CS - epsilon - ((Z + 1) * (z / 2))
     LorAmp2 = (2/12)*intensity/(np.pi*L2)
-    p2 = voigt_byrne(x, x2, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L2, LorAmp2)
+    p2 = voigt(x, x2, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L2, LorAmp2)
 
     # p3
     x3 = 0 + CS - epsilon - ((Z - 1) * (z / 2))
     LorAmp3 = (1/12)*intensity/(np.pi*L3)
-    p3 = voigt_byrne(x, x3, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L3, LorAmp3)
+    p3 = voigt(x, x3, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L3, LorAmp3)
 
     # p4
     x4 = 0 + CS - epsilon + ((Z - 1) * (z / 2))
     LorAmp4 = (1/12)*intensity/(np.pi*L3)
-    p4 = voigt_byrne(x, x4, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L3, LorAmp4)
+    p4 = voigt(x, x4, np.sqrt( ((Z-1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L3, LorAmp4)
 
     # p5
     x5 = 0 + CS - epsilon + ((Z + 1) * (z / 2))
     LorAmp5 = (2/12)*intensity/(np.pi*L2)
-    p5 = voigt_byrne(x, x5, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L2, LorAmp5)
+    p5 = voigt(x, x5, np.sqrt( ((Z+1)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L2, LorAmp5)
 
     # p6
     x6 = 0 + CS + epsilon + ((Z + 3) * (z / 2))
     LorAmp6 = (3/12)*intensity/(np.pi*L1)
-    p6 = voigt_byrne(x, x6, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L1, LorAmp6)
+    p6 = voigt(x, x6, np.sqrt( ((Z+3)*(1/2)*sigH)**2 + sigma_ep**2 + sigma_CS**2 ), L1, LorAmp6)
     
     y=counts+(p1+p2+p3+p4+p5+p6)
     return (y)   
