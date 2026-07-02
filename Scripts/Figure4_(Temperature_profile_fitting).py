@@ -28,7 +28,8 @@ import matplotlib.animation as animation
 import pandas as pd
 
 #define the directory containing the data to be fitted
-file_home= r"..\Data\2L-Fh\profile\"
+file_home= r"../Data/2L-Fh"
+save_home=r"../../260611_Saved_Figures"
 
 #LOAD FILES
 def load_files(directory, pattern, calfile):
@@ -988,12 +989,136 @@ plt.show()
   
 #%%
   
-# Create Table of paramters
+#%%
 
+def calculate_global_reduced_chi2(spectra_dict, calculated_dict, norm_factor, optimized_values, fixed_param_count=0):
+    """
+    Calculates the global reduced chi-squared across a temperature series matrix.
+    
+    Parameters:
+    -----------
+    spectra_dict : dict
+        Experimental normalized data. Keys are strings (e.g., '77.0'), values are 1D arrays.
+    calculated_dict : dict
+        Optimized model fit data. Keys match spectra_dict, values are 1D arrays.
+    norm_factor : dict
+        The raw background counts (N0) used to denormalize variance. Keys match spectra_dict.
+    optimized_values : dict
+        Dictionary of all parameters passed to/handled by the optimizer.
+    fixed_param_count : int, optional
+        Number of parameters in optimized_values that were frozen/fixed during the fit.
+    """
+    total_chi_squared = 0.0
+    total_data_points = 0
+    
+    # Loop through each temperature slice present in your experimental data
+    for key in spectra_dict.keys():
+        y_exp = np.asarray(spectra_dict[key])
+        y_calc = np.asarray(calculated_dict[key])
+
+        # Element-wise squared residuals on the raw count scale
+        residuals_squared = (y_exp - y_calc) ** 2
+        
+        # Pure Poisson variance for raw counts is simply the counts themselves
+        variance = y_exp 
+        
+        # Sum up the true chi-squared contribution for this temperature
+        chi_squared_t = np.sum(residuals_squared / variance)
+                               
+        # Accumulate totals across the entire matrix
+        total_chi_squared += chi_squared_t
+        total_data_points += len(y_exp)
+        
+    # Calculate degrees of freedom: nu = N_total - P
+    # P is the number of dynamically varied parameters
+    total_params = len(optimized_values)
+    P = total_params - fixed_param_count
+    dof = total_data_points - P
+    
+    if dof <= 0:
+        raise ValueError(f"Degrees of freedom ({dof}) is zero or negative. Check your parameter count.")
+        
+    global_reduced_chi_squared = total_chi_squared / dof
+    
+    # Return a dictionary of the final descriptive metrics
+    return {
+        "total_chi2": total_chi_squared,
+        "total_points": total_data_points,
+        "degrees_of freedom": dof,
+        "reduced_chi2": global_reduced_chi_squared
+    }
+
+def calculate_global_nrmse(spectra_dict, calculated_dict):
+    """
+    Calculates the global Normalized Root-Mean-Square Error (NRMSE) 
+    across a temperature-velocity matrix.
+    
+    Returns the error as a percentage (%).
+    """
+    all_residuals_sq = []
+    all_y_exp = []
+    
+    # Pool all data and residuals across the entire matrix
+    for key in spectra_dict.keys():
+        y_exp = np.asarray(spectra_dict[key])
+        y_calc = np.asarray(calculated_dict[key])
+        
+        # Calculate residuals for this temperature slice
+        residuals_sq = (y_exp - y_calc) ** 2
+        
+        # Extend our global pools
+        all_residuals_sq.extend(residuals_sq)
+        all_y_exp.extend(y_exp)
+        
+    # Convert pooled lists to numpy arrays for vector maths
+    all_residuals_sq = np.array(all_residuals_sq)
+    all_y_exp = np.array(all_y_exp)
+    
+    # Calculate the global Root-Mean-Square Error (RMSE)
+    rmse = np.sqrt(np.mean(all_residuals_sq))
+    
+    # Normalize by the global peak-to-baseline intensity range of the data
+    # (Maximum baseline value minus minimum absorption peak value found in the matrix)
+    data_range = np.max(all_y_exp) - np.min(all_y_exp)
+    
+    # Calculate NRMSE as a percentage
+    nrmse_percentage = (rmse / data_range) * 100
+    
+    return nrmse_percentage
+
+#Calculate a global reduced chi2 for each optimised matrix
+data_denorm={key: spectra_dict[key] * norm_factor[key] for key in spectra_dict}
+
+sorted_keys = sorted(spectra_dict.keys(), key=float)
+static_denorm = {key: row * norm_factor[key] for key, row in zip(sorted_keys, optimised_spectra_matrix_static)}
+dynamic_denorm = {key: row * norm_factor[key] for key, row in zip(sorted_keys, optimised_spectra_matrix_dynamic)}
+blume_denorm = {key: row * norm_factor[key] for key, row in zip(sorted_keys, optimised_spectra_matrix_blume)}
+
+static_red_chi_sq=calculate_global_reduced_chi2(data_denorm, static_denorm, norm_factor, optimised_params_static, fixed_param_count=2)
+dynamic_red_chi_sq=calculate_global_reduced_chi2(data_denorm, dynamic_denorm, norm_factor, optimised_params_dynamic, fixed_param_count=2)
+blume_red_chi_sq=calculate_global_reduced_chi2(data_denorm, blume_denorm, norm_factor, optimised_params_blume, fixed_param_count=2)
+ 
+static_nrmse = calculate_global_nrmse(data_denorm, static_denorm)
+dynamic_nrmse = calculate_global_nrmse(data_denorm, dynamic_denorm)
+blume_nrmse = calculate_global_nrmse(data_denorm, blume_denorm)
+
+
+#%%
+  
+# Create Table of paramters
 
 static_opt = dict(zip(params_static, optimised_params_static))
 dynamic_opt = dict(zip(params_dynamic, optimised_params_dynamic))
 blume_opt = dict(zip(params_blume, optimised_params_blume))
+
+static_opt['global_red_chi2'] = static_red_chi_sq['reduced_chi2']
+static_opt['global_nrmse'] = static_nrmse
+
+dynamic_opt['global_red_chi2'] = dynamic_red_chi_sq['reduced_chi2']
+dynamic_opt['global_nrmse'] = dynamic_nrmse
+
+blume_opt['global_red_chi2'] = blume_red_chi_sq['reduced_chi2']
+blume_opt['global_nrmse'] = blume_nrmse
 
 models_data = [
     ('xVBF',         static_opt,  fixed_parameters_static),
@@ -1020,8 +1145,10 @@ parameter_rows = [
     ('B',           'B'),
     ('C',           'C'),
     ('linewidth_L', 'Γ [mm/s]'), 
+    ('divider',     '--------------------'),
+    ('global_red_chi2', 'Reduced χ²'),
+    ('global_nrmse',    'Global NRMSE (%)'),    
 ]
-
 
 table_data = []
 for var_name, display_name in parameter_rows:
@@ -1060,7 +1187,7 @@ print("="*50)
 print(df_results)
 
 
-excel_path = file_home + "/Parameter_Comparison_Table.xlsx"
+excel_path = save_home + "/Parameter_Comparison_Table.xlsx"
 
 try:
     df_results.to_excel(excel_path)
@@ -1069,5 +1196,77 @@ except ImportError:
     print("\nError: 'openpyxl' library not found. Saving as CSV instead.")
     # Fallback to CSV if you don't have the excel library installed
     # We use sep=';' which works better for European Excel versions
-    df_results.to_csv(file_home + "/Parameter_Comparison_Table.csv", sep=';')
-    print(f"CSV saved to: {file_home}/Parameter_Comparison_Table.csv")
+    df_results.to_csv(save_home + "/Parameter_Comparison_Table.csv", sep=';')
+    print(f"CSV saved to: {save_home}/Parameter_Comparison_Table.csv")
+
+#%% variance plot
+
+temp_ticks = sorted([float(key) for key in data_denorm.keys()])
+temperature_axis = np.array(temp_ticks)
+
+velocity_axis = np.asarray(velocity)
+
+V_grid, T_grid = np.meshgrid(velocity_axis, temperature_axis)
+
+misfit_static  = np.zeros(V_grid.shape)
+misfit_dynamic = np.zeros(V_grid.shape)
+misfit_blume   = np.zeros(V_grid.shape)
+
+for i, t_val in enumerate(temperature_axis):
+    key = f"{t_val:.1f}" if f"{t_val:.1f}" in data_denorm else str(t_val)
+    
+    # Calculate residuals (Experimental Raw Counts - Calculated Raw Counts)
+    misfit_static[i, :]  = data_denorm[key] - static_denorm[key]
+    misfit_dynamic[i, :] = data_denorm[key] - dynamic_denorm[key]
+    misfit_blume[i, :]   = data_denorm[key] - blume_denorm[key]
+
+# Create a 1-row, 3-column subplot configuration
+fig, axes = plt.subplots(1, 3, figsize=(18, 5), sharex=True, sharey=True, dpi=300)
+models = [
+    ('Static xVBF', misfit_static),
+    ('xVBF-Wickman (Dynamic)', misfit_dynamic),
+    ('Blume-Tjon', misfit_blume)
+]
+
+# Find a global symmetric color scale bound based on your maximum error
+# This ensures that all three plots share the exact same color intensity scale
+max_error = max(np.max(np.abs(misfit_static)), 
+                np.max(np.abs(misfit_dynamic)), 
+                np.max(np.abs(misfit_blume)))
+
+# Loop through the models to build each subplot panel
+for ax, (title, matrix) in zip(axes, models):
+    # Use 'RdBu_r' diverging map: 0 deviation is pristine white
+    mesh = ax.pcolormesh(
+        V_grid, 
+        T_grid, 
+        matrix, 
+        cmap='RdBu_r', 
+        vmin=-max_error, 
+        vmax=max_error, 
+        shading='auto'
+    )
+    
+    ax.set_title(title, fontsize=12, fontweight='bold')
+    ax.set_xlabel('Velocity (mm/s)', fontsize=16)
+
+# Label the shared Y-axis (only visible on the far-left plot due to sharey=True)
+axes[0].set_ylabel('Temperature (K)', fontsize=16)
+
+# Add a single unified colorbar on the right side of the figure
+fig.subplots_adjust(right=0.88)
+cbar_ax = fig.add_axes([0.90, 0.15, 0.015, 0.7])
+cbar = fig.colorbar(mesh, cax=cbar_ax)
+cbar.set_label('Residual Counts ($Y_{exp} - Y_{calc}$)', rotation=270, labelpad=15)
+
+plt.suptitle('Global Model Misfit Comparisons', fontsize=14, fontweight='bold', y=1.02)
+
+# Save configuration
+save_path = save_home + "/figure4_misfit_comparison.png"
+try:
+    plt.savefig(save_path, bbox_inches='tight')
+    print(f"Misfit comparison plot successfully saved to: {save_path}")
+except NameError:
+    pass
+
+plt.show()
