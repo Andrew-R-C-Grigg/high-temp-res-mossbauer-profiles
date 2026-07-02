@@ -277,7 +277,7 @@ if __name__ == '__main__':
     initial_guess_dynamic.append(0.02)   # Initial guess for C
     
     tight_bounds_dynamic = []
-    TOLERANCE = 0.25  # 25% wiggle room 
+    TOLERANCE = 0.25  # 25% wiggle room to apply the previously optimised parameters to the next model.
     for i, (orig_lower, orig_upper) in enumerate(parameter_bounds_static):
         val = optimised_params_static[i]
         orig_lower, orig_upper = parameter_bounds_static[i]
