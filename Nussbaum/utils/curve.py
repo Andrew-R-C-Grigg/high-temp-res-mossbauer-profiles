@@ -14,8 +14,6 @@ License: Apache 2.0 (http://www.apache.org/licenses/)
 """
 
 import numpy as np
-from nussbaum.utils import s2n
-import astropy.modeling.functional_models as astro
 from joblib import Parallel, delayed # Import Parallel and delayed from joblib
 import os
 import sys
@@ -25,12 +23,10 @@ import warnings
 from scipy.optimize import minimize
 from scipy.optimize import fixed_point
 from scipy.optimize import curve_fit
-import scipy.special as scipysp
 from scipy import stats
 from scipy import integrate
 from scipy import constants
 from scipy.integrate import quad
-from scipy.signal import convolve
 import math
 import matplotlib.pyplot as plt
 
@@ -373,8 +369,8 @@ def sextet_xVBF_relax(x,CS,epsilon,H,sigma_CS=0,sigma_ep=0,sigma_H=0,intensity=3
        
     gamma2=gamma*2 # convert to FWHM
     
-Max_L2=10
-    Max_L3=15
+    Max_L2=3
+    Max_L3=3
     L1=gamma2
     L2=2*gamma + A * W_relax
     if L2 > Max_L2: L2 = Max_L2
@@ -472,12 +468,11 @@ def create_gaussian_samples(mean, sigma, N_STEPS):
     # Calculate the Gaussian "weight" for each point
     weights = np.exp(-0.5 * ((points - mean) / sigma)**2)
     
-    # Normalize the weights to sum to 1.0
+    # Normalise the weights to sum to 1.0
     weights = weights / np.sum(weights)
     
     return points, weights
 
-# 
 def create_gaussian_kernel(x_values, sigma):
     """
     Creates a 1D Gaussian kernel for fast convolution.
@@ -490,7 +485,7 @@ def create_gaussian_kernel(x_values, sigma):
         sigma (float): The Gaussian width in physical units (e.g., mm/s).
         
     Returns:
-        np.ndarray: A 1D kernel, normalized to sum to 1.0.
+        np.ndarray: A 1D kernel, normalised to sum to 1.0.
     """
     
     # If sigma is tiny, just return a delta function.
@@ -511,7 +506,7 @@ def create_gaussian_kernel(x_values, sigma):
     # Calculate the Gaussian
     kernel = np.exp(-0.5 * (kernel_x / sigma_pixels)**2)
     
-    # Normalize the kernel to sum to 1.0
+    # Normalise the kernel to sum to 1.0
     return kernel / np.sum(kernel)
 
     
@@ -649,7 +644,7 @@ def calculate_CS(thD, T, del1):
     ----------
      thD : the Debye temperature (K)
      T : measurement temperature (K)
-     CS_nought : the QS at 0 K
+     CS_nought : the CS at 0 K
 
     Returns
     -------
@@ -763,7 +758,7 @@ def brillouin (Temp,T_Block,B_sat,B_Temp,nu):
     B_sat : Saturation magnetic field (at T=0) in Tesla.
     B_Temp : The magnetic field at the current temperature `Temp`. 
         (Used to calculate the reduced magnetization for the Bean-Rodbell correction).
-    nu : The Bean-Rodbell deformation parameter ($\eta$), which characterizes the 
+    nu : The Bean-Rodbell deformation parameter, which characterizes the 
         volume dependence of the exchange integral.
 
 
@@ -781,7 +776,7 @@ def brillouin (Temp,T_Block,B_sat,B_Temp,nu):
         
         This computes x = (g * mu_B * H_eff) / (k_B * T), modified by the Bean-Rodbell 
         term which scales the ordering temperature based on the square of the 
-        reduced magnetization ((B_Temp/B_sat)^2).
+        reduced magnetisation ((B_Temp/B_sat)^2).
         
         Returns
         -------
@@ -792,7 +787,7 @@ def brillouin (Temp,T_Block,B_sat,B_Temp,nu):
             return np.inf
         if abs(B_sat) < 1e-9: # Handle near-zero B_sat
             return 0.0 # Return 0 for x if B_sat is very close to zero
-        x=(-2*(-15/14)-4*(2331/9604)*((B_Temp**2)/(B_sat**2))*nu)*((T_Block)/Temp)*(B_Temp/B_sat)
+        x=(-2*(-15/14)+4*(2331/9604)*((B_Temp**2)/(B_sat**2))*nu)*((T_Block)/Temp)*(B_Temp/B_sat)
         return x
 
     x=BeanRodbell(Temp,T_Block,B_sat,B_Temp,nu)
@@ -842,7 +837,7 @@ def Temp_H(Temp, T_Block, B_sat, B_Temp_init_input, nu):
     if Temp > (T_Block + 0.1):
         return 0.0
     
-    def recursive_B_Temp(B_Temp, iteration_counter=[0]): # Initialize iteration counter
+    def recursive_B_Temp(B_Temp, iteration_counter=[0]): # Initialise iteration counter
         iteration_counter[0] += 1 # Increment counter
         brillouin_result = brillouin(Temp, T_Block, B_sat, B_Temp, nu) # Call brillouin here
         return brillouin_result
@@ -852,7 +847,7 @@ def Temp_H(Temp, T_Block, B_sat, B_Temp_init_input, nu):
     try:
         B_Temp_solution = fixed_point(recursive_B_Temp, B_Temp_init, maxiter=3000,  xtol=1e-3) # Increased maxiter
     except RuntimeError as e:
-        raise # Re-raise the exception to stop optimization
+        raise # Re-raise the exception to stop optimisation
 
     return B_Temp_solution
 
@@ -872,13 +867,13 @@ def Temp_distribution(T_Block,T_B_sigma,res=100):
 
     Parameters
     ----------
-    T_Block : The mean Blocking Temperature (center of the distribution) in Kelvin.
+    T_Block : The mean blocking temperature (center of the distribution) in Kelvin.
     T_B_sigma : The standard deviation of the Blocking Temperature distribution in Kelvin.
     res : The resolution (number of sample points) to generate. Default is 100.
 
     Returns
     -------
-    An array of `res` Blocking Temperature values sorted from low to high.
+    An array of blocking temperature values sorted from low to high.
     """
     
     # set the distribution for loc=mean blocking temperature and scale=stdev of blocking tmeprature distribution
@@ -898,7 +893,6 @@ def Temp_distribution(T_Block,T_B_sigma,res=100):
     
     return(T_Block_dist)
 
-
 def prefit_debye_temp(spectra_dict, velocity_axis):
     """ 
     A function to fit the debye temperature based on measured area of the spectra
@@ -912,15 +906,15 @@ def prefit_debye_temp(spectra_dict, velocity_axis):
     for T in temps:
         spectrum = spectra_dict[T]
         
-        # Simple Trapezoidal Integration of the absorption
+        # Simple trapezoidal integration of the absorption
         absorption = 1.0 - spectrum
         area = np.trapz(absorption, x=velocity_axis)
             
     areas = np.array(areas)
     valid_temps = np.array(valid_temps)
     
-    # Normalize areas to the lowest temperature
-    normalized_areas = areas / areas[0]
+    # Normalise areas to the lowest temperature
+    normalised_areas = areas / areas[0]
 
     # 2. Define the Model to fit ONLY the areas
     def area_model(T, fitted_thD, scale_factor):
@@ -933,7 +927,7 @@ def prefit_debye_temp(spectra_dict, velocity_axis):
         return scale_factor * (f_vals / f_ref)
 
     # Fit
-    popt, pcov = curve_fit(area_model, valid_temps, normalized_areas, p0=[350, 1.0], bounds=([100, 0.5], [1000, 1.5]))
+    popt, pcov = curve_fit(area_model, valid_temps, normalised_areas, p0=[350, 1.0], bounds=([100, 0.5], [1000, 1.5]))
     
     fitted_thD = popt[0]
     fitted_scale = popt[1]
@@ -989,7 +983,7 @@ def collapsed_static(x,
     B_sat : Saturation Hyperfine Field at T=0 (Tesla).
     sigma_H : Distribution width of the Hyperfine Field (Voigt broadening).
     intensity : Global intensity scaling factor.
-    counts : Baseline counts (usually 1.0 for normalized transmission).
+    counts : Baseline counts (usually 1.0 for normalised transmission).
     T_Block : Mean Blocking Temperature of the particle distribution (Kelvin).
     sig_T_Block : Standard deviation of the Blocking Temperature distribution (Kelvin).
     T_measured : The experimental measurement temperature (Kelvin).
@@ -1115,7 +1109,7 @@ def collapsed_wickman(x,
     B_sat : Saturation Hyperfine Field at T=0 (Tesla).
     sigma_H : Distribution width of the Hyperfine Field (Voigt broadening).
     intensity : Global intensity scaling factor.
-    counts : Baseline counts (usually 1.0 for normalized transmission).
+    counts : Baseline counts (usually 1.0 for normalised transmission).
     T_Block : Mean Blocking Temperature of the particle distribution (Kelvin).
     sig_T_Block : Standard deviation of the Blocking Temperature distribution (Kelvin).
     T_measured : The experimental measurement temperature (Kelvin).
@@ -1166,8 +1160,8 @@ def collapsed_wickman(x,
 
         # Calculate W_relax (dynamic broadening)
         E_B = E_barrier_ratio * k_B * T_B_particle
-        Gamma_relax_Hz = f0 * np.exp(-E_B / (k_B * T_measured))
-        W_relax_mms = Gamma_relax_Hz * CONV_FACTOR_RADS_TO_MMS
+        Gamma_relax = f0 * np.exp(-E_B / (k_B * T_measured))
+        W_relax_mms = Gamma_relax * CONV_FACTOR_RADS_TO_MMS
 
         # H=0 is a doublet
         if H > 1e-5:
@@ -1189,9 +1183,10 @@ def collapsed_wickman(x,
                                  W_relax=W_relax_mms,
                                  A=A,
                                  B=B
-                                ))    
+                                ))
+            
             sext.append(slice_shape)
-            doub.append(np.nan *np.ones(len(x))) # Add placeholder for averaging          
+            doub.append(np.nan *np.ones(len(x))) # Add placeholder for averaging           
             all_slices.append(slice_shape)
 
         else:
@@ -1207,8 +1202,9 @@ def collapsed_wickman(x,
                                  counts=counts,
                                  W_relax=W_relax_mms, C=C
                                 ))
-            doub.append(slice_shape) 
-            sext.append(np.nan *np.ones(len(x))) # Add placeholder for averaging
+            
+            doub.append(slice_shape)        
+            sext.append(np.nan *np.ones(len(x))) # Add placeholder for averaging           
             all_slices.append(slice_shape)
 
     # Final Averaging
@@ -1339,10 +1335,10 @@ def collapsed_blume(x,
         
         # Calculate Gamma_relax based on this particle's T_B
         E_B = ENERGY_BARRIER_RATIO * k_B * T_B_particle 
-        Gamma_relax_Hz = f0 * np.exp(-E_B / (k_B * T_measured))
+        Gamma_relax_rads = f0 * np.exp(-E_B / (k_B * T_measured))
         
         CONV_FACTOR_RADS_TO_MMS = 8.605e-8 / (2 * np.pi) 
-        Gamma_relax_mms = Gamma_relax_Hz * CONV_FACTOR_RADS_TO_MMS 
+        Gamma_relax_mms = Gamma_relax_rads * CONV_FACTOR_RADS_TO_MMS 
 
         # Cap the mm/s value, not the Hz value.
         # A cap of 10,000 mm/s is more than enough for full collapse.
@@ -1516,10 +1512,10 @@ def plot_initial_model_vs_measured(measured_spectra_dict, x_values, collapsed_fu
         plt.plot(x_values, initial_model_spectrum, label=f'Initial Model ({temp_to_plot}K)', linestyle='--') # Dashed line for model
 
         plt.xlabel('velocity') # x-axis label
-        plt.ylabel('Transmission (Background Normalized)') # y-axis label
-        plt.title(f'Measured vs Initial Model Spectrum at {temp_to_plot}K\n(Background Normalized)') # Informative title
+        plt.ylabel('Transmission (Background Normalised)') # y-axis label
+        plt.title(f'Measured vs Initial Model Spectrum at {temp_to_plot}K\n(Background Normalised)') 
         plt.legend()
-        plt.grid(False) # Keep grid off for cleaner look if you prefer
+        plt.grid(False) # Keep grid off for cleaner look
         plt.xlim(x_values.min(), x_values.max()) # Set x-axis limits to data range
 
         plot_filename = os.path.join(plot_dir, f'initial_model_vs_measured_{temp_to_plot}K.png')
