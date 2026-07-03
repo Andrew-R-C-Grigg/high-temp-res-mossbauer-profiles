@@ -77,28 +77,34 @@ def fit_1s2d(data, x, Aread, CSd, QSd, sigmaQSd, Aread2, CSd2, QSd2, sigmaQSd2,
                            maxfev=10000, 
                            **tolerance_options)
     
-    if popt[11] < 0.55:
-        # New Bounds for second pass
-        b_lower_2 = [0,     -0.0,    0.5, 0,  
-                     0,     -0.0,    0.5, 0,         
-                     0,     -0.0, -0.3, 0, -1,     0,       intensity-(0.2*intensity),    counts-1]
-        
-        b_lower_2[8] = 1e-11 
+    # New Bounds for second pass
+    b0_2 = (b_lower, b_upper)
+    p0_new = list(popt)
+    if popt[11] < 0.01:
 
-        b_upper_2 = [10000,    1,    1.1, 0.8,  
-                     10000,    1,    2.0, 2.0,   
-                     1e-9,   1,     0,   55, 1,    Hs,       intensity+(0.2*intensity),    counts+1]
+        b0_2[0][8] = 0  
+        b0_2[1][8] = 1e-20
+        p0_new[8] = 0
         
-        b0_2 = (b_lower_2, b_upper_2)
+    if popt[0]<0.01:
+        b0_2[0][0] = 0  
+        b0_2[1][0] = 1e-20
+        p0_new[0] = 0
+    if popt[4]<0.01:
+        b0_2[0][4] = 0  
+        b0_2[1][4] = 1e-20
+        p0_new[4] = 0
+    if popt[8]<0.01:
+        b0_2[0][8] = 0  
+        b0_2[1][8] = 1e-20
+        p0_new[8] = 0
         
-        p0_new = list(popt)
-        p0_new[8] = 1e-11
-        
-        popt, pcov = curve_fit(spec_1s2d, x, data, p0_new, 
-                               bounds=b0_2, 
-                               method='trf', 
-                               maxfev=10000, 
-                               **tolerance_options)
+    popt, pcov = curve_fit(spec_1s2d, x, data, p0_new, 
+                           bounds=b0_2, 
+                           method='trf', 
+                           maxfev=10000, 
+                           **tolerance_options)
+
         
     return popt, pcov
 
