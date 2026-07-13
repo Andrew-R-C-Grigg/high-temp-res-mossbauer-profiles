@@ -39,8 +39,8 @@ import csv
 # import pickle
 import math
 import numpy as np
-import nussbaum.utils.s2n as s2n
-import nussbaum.utils.fold as fold
+import Nussbaum.utils.s2n as s2n
+import Nussbaum.utils.fold as fold
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import comtypes
