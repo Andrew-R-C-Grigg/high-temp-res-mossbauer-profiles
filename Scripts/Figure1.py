@@ -18,8 +18,8 @@ import os
 import glob
 import pandas as pd
 from scipy.optimize import curve_fit
-from nussbaum.utils import fold, s2n
-from nussbaum.utils import curve as moss
+from Nussbaum.utils import fold, s2n
+from Nussbaum.utils import curve as moss
 import re
 import traceback
 from datetime import datetime
