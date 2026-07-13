@@ -18,8 +18,8 @@ import numpy as np
 import os
 import sys
 import re
-from nussbaum.utils import fold as fold
-from nussbaum.utils import s2n as s2n
+from Nussbaum.utils import fold as fold
+from Nussbaum.utils import s2n as s2n
 import matplotlib.animation as animation
 
 import tkinter as tk
