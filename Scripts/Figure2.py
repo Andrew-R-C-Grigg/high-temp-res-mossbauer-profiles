@@ -14,7 +14,7 @@ import numpy as np
 import csv
 import os
 import re
-from nussbaum.utils import fold, s2n
+from Nussbaum.utils import fold, s2n
 import glob
 
 
