@@ -11,7 +11,7 @@ import re
 import os
 import glob
 import numpy as np
-from nussbaum.utils import fold, s2n
+from Nussbaum.utils import fold, s2n
 
 
 #LOAD FILES
