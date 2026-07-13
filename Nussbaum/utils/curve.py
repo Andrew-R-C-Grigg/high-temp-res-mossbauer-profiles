@@ -194,14 +194,11 @@ def sextet_VBF(x,CS,epsilon,H,sigma=0,intensity=30000,counts=0):
 
 
     mun=3.1524512605e-8 #ev/T
-    # mun=5.050783699e-27
     mu0=0.09024*mun
     mu1=0.1535*mun
     
     c=299792458000  #mm/s
     Egam=14412.497 #eV
-    
-    # 1T = 10000 Oe
     
     B=H
 
@@ -348,7 +345,7 @@ def sextet_xVBF_relax(x,CS,epsilon,H,sigma_CS=0,sigma_ep=0,sigma_H=0,intensity=3
     '''        
 
     gamma=0.139627911023937
-    sigmaH=1.0*sigma_H # I am not sure why this is necessary
+    sigmaH=1.0*sigma_H
 
     mun=3.1524512605e-8 #ev/T
     # mun=5.050783699e-27
