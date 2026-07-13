@@ -27,14 +27,19 @@ from datetime import datetime
 import matplotlib.animation as animation
 import pandas as pd
 
+from pathlib import Path
+root_dir = Path(__file__).resolve().parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
 #define the directory containing the data to be fitted
+
 file_home= r"../Data/2L-Fh"
 save_home=r"../../260611_Saved_Figures"
 
 #LOAD FILES
 def load_files(directory, pattern, calfile):
     # Dictionary to store file contents with the unique part of file names as the key
-    file_dict = {}
+    file_dict,norm_factor = {},{}
     number_pattern = r"(\d+\.\d+)" #this is designed to import data with names from the automated saving function
     
     # Loop through all files in the specified directory
@@ -60,28 +65,27 @@ def load_files(directory, pattern, calfile):
                     
                     #find background value for velocity domain spectrum to normalise each spectrum to its background count intensity
                     bkg=s2n.bkg(folded)
-                    
-                    norm_to_one = folded/bkg
-                                        
+
+                    norm_factor[key] = bkg
                     file_dict[key] = folded/bkg
     
     print("loaded all files")
                      
-    return file_dict, x
+    return file_dict, x, norm_factor
 
 # define data files
-directory_path=file_home+"\profile"
+directory_path=file_home+"/profile"
 pattern = r"\d+\.\d+K"  # Pattern to match files like 77.0K.dat or 101.0K.dat
 calfile=file_home+'/'+'250624_v12.dat'
 cal=fold.calibrate(calfile)
 
-highSNR_directory_path=file_home+"\high_SNR_spectra"
+highSNR_directory_path=file_home+"/high_SNR_spectra"
 highSNR_pattern = r"\d+\.\d+K_\d+\.\d+h"  # Pattern to match files like 77.0K.dat or 101.0K.dat
 
 # execute
 start_time = time.perf_counter()
-spectra_dict, velocity = load_files(directory_path, pattern, cal)
-highSNR_dict,velocity = load_files(highSNR_directory_path, highSNR_pattern, cal)
+spectra_dict, velocity, norm_factor = load_files(directory_path, pattern, cal)
+highSNR_spectra_dict, _, _ = load_files(highSNR_directory_path, highSNR_pattern, cal)
 
 
 #%%
@@ -98,7 +102,7 @@ if __name__ == '__main__':
     x_values =velocity
 
     highSNR_spectra_dict_numeric_keys = {}
-    for temp_str, spectrum_data in highSNR_dict.items():
+    for temp_str, spectrum_data in highSNR_spectra_dict.items():
         try:
             temp_numeric = float(temp_str)  # Convert string key to float
             highSNR_spectra_dict_numeric_keys[temp_numeric] = spectrum_data
@@ -108,6 +112,8 @@ if __name__ == '__main__':
     highSNR_spectra_dict = highSNR_spectra_dict_numeric_keys # Use the dict with numeric keys
 
     # Perform a pre-fit of the Debye temperature
+    sorted_items = sorted(highSNR_spectra_dict_numeric_keys.items(), key=lambda x: x[0])
+    highSNR_spectra_dict = dict(sorted_items)
     fixed_thD_val, _ = moss.prefit_debye_temp(highSNR_spectra_dict, x_values)
 
     areas = []
@@ -156,10 +162,10 @@ if __name__ == '__main__':
 
     ]
     initial_guess_static = [
-        fixed_thD_val, 0.55, 0.9, 0.31, 0.2, 50, 2.6, 65, 10, 2, 0.7845, 4,  # Initial guess for counts (e.g., 1.0)
+        fixed_thD_val, 0.55, 0.9, 0.31, 0.2, 50, 2.6, 65, 15, 0.9, 0.7845, 4,  # Initial guess for counts (e.g., 1.0)
     ]
     parameter_bounds_static = [
-        (fixed_thD_val*0.9, fixed_thD_val*2), (0.45, 0.6), (0.6, 1.2), (0.2, 0.6), (0,0.5), (45, 60), (1, 4), (58, 78), (1, 30), (0.1, 3.0), (0,1.5708), (3,7.5), 
+        (fixed_thD_val*0.9, fixed_thD_val*2), (0.45, 0.6), (0.6, 1.2), (0.2, 0.9), (0,0.5), (45, 60), (1, 4), (58, 90), (1, 30), (0.2,1.5), (0,1.5708), (3,7.5), 
     ]
     
     fixed_parameters_static = {'counts':1.0,
@@ -282,7 +288,8 @@ if __name__ == '__main__':
     for i, (orig_lower, orig_upper) in enumerate(parameter_bounds_static):
         val = optimised_params_static[i]
         orig_lower, orig_upper = parameter_bounds_static[i]
-        
+
+        param_name = params_static[i]
         if name == 'sig_T_Block':
             # Give it wide-open bounds to *correct* the static fit
             tight_bounds_dynamic.append((1.0, 30.0)) 
