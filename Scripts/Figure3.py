@@ -12,7 +12,7 @@ import numpy as np
 import os
 import re
 import glob
-from nussbaum.utils import fold, s2n
+from Nussbaum.utils import fold, s2n
 
 # =============================================================================
 # SECTION 1: FILE LOADING
