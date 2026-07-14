@@ -285,14 +285,16 @@ if file_dict_stack and velocity_stack is not None:
                     'Temp': f"{key}K", 'temp_val': current_temp, 
                     'Phase': 'Doublet 1', 'Interp': 'Doublet 1',
                     'Rel. spec. area': frac_doublet_1,
-                    'CS': popt[1], 'QS or ε': popt[2], 'σQS or σε': popt[3], 'H': 'N/A', 'σH': 'N/A',
+                    'CS': popt[1], 'QS or ε': popt[2], 'σQS or σε': popt[3], 
+                    'H': 'N/A', 'σH': 'N/A','<|H|>': 'N/A', 'σ<|H|>': 'N/A',
                     'chi2':chi2['reduced_chi2'],'nrmse':nrmse
                 })
                 excel_data_rows.append({
                     'Temp': f"{key}K", 'temp_val': current_temp, 
                     'Phase': 'Doublet 2', 'Interp': 'Doublet 2',
                     'Rel. spec. area': frac_doublet_2,
-                    'CS': popt[5], 'QS or ε': popt[6], 'σQS or σε': popt[7], 'H': 'N/A', 'σH': 'N/A',
+                    'CS': popt[5], 'QS or ε': popt[6], 'σQS or σε': popt[7], 
+                    'H': 'N/A', 'σH': 'N/A','<|H|>': 'N/A', 'σ<|H|>': 'N/A',
                     'chi2':chi2['reduced_chi2'],'nrmse':nrmse
                 })
                 excel_data_rows.append({
@@ -302,7 +304,8 @@ if file_dict_stack and velocity_stack is not None:
                     'CS': popt[9], 'QS or ε': popt[10], 'σQS or σε': popt[12], 
                     'H': popt[11], 'σH': popt[13],'<|H|>': meanH, 'σ<|H|>': std_meanH,
                     'chi2':chi2['reduced_chi2'],'nrmse':nrmse
-                }))
+                })
+
 
             except RuntimeError:
                 print(f"Fit failed for {key}K")
@@ -544,7 +547,8 @@ if excel_data_rows:
     print("Generating Excel report...")
     df_output = pd.DataFrame(excel_data_rows)
     df_output = df_output.sort_values(by=['temp_val', 'Phase'])
-    cols = ['Temp', 'Phase', 'Interp', 'Rel. spec. area', 'CS', 'QS or ε', 'σQS or σε', 'H', 'σH']
+    cols = ['Temp', 'Phase', 'Interp', 'Rel. spec. area', 'CS', 'QS or ε', 'σQS or σε', 'H', 'σH','<|H|>', 'σ<|H|>','chi2','nrmse']
+
     df_final = df_output[cols]
     
     save_excel_path = "Table_S1_Fitting_Parameters.xlsx"
