@@ -299,9 +299,10 @@ if file_dict_stack and velocity_stack is not None:
                     'Temp': f"{key}K", 'temp_val': current_temp,
                     'Phase': 'Sextet', 'Interp': 'Sextet',
                     'Rel. spec. area': frac_sextet,
-                    'CS': popt[9], 'QS or ε': popt[10], 'σQS or σε': popt[12], 'H': meanH, 'σH': std_meanH,
+                    'CS': popt[9], 'QS or ε': popt[10], 'σQS or σε': popt[12], 
+                    'H': popt[11], 'σH': popt[13],'<|H|>': meanH, 'σ<|H|>': std_meanH,
                     'chi2':chi2['reduced_chi2'],'nrmse':nrmse
-                })
+                }))
 
             except RuntimeError:
                 print(f"Fit failed for {key}K")
