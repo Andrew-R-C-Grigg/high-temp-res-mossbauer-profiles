@@ -39,25 +39,21 @@ Core Components & Utility Modules
 
     The curve module provides the physical backbone for fitting complex mineralogical samples:
 
-    Voigt-based Profiles: Uses numerical approximations for Voigt-based peaks to account for both Lorentzian (lifetime) and Gaussian (site distribution) broadening.
+    Voigt-based Profiles (Uses numerical approximations for Voigt-based peaks to account for both Lorentzian (lifetime) and Gaussian (site distribution) broadening),
 
-    Physical Models:
+    Modifidied Voigt-based Profiles (broadening based on the relaxation time)
 
-        Magnetic Sextets & Quadrupole Doublets.
-
-        Debye Temperature (ThD​): Modeling the Second-Order Doppler Shift (SODS) and Recoilless Fraction across temperature profiles.
-
-        Blocking Temperature: Fitting superparamagnetic behavior in nanoparticles.
+    Dynamic relaxation-based profile (using an implementation of the Blume-Tjon model)
 
     Parallel Processing: Utilizes joblib for high-performance fitting of large data matrices.
 
-4. Visualization & Analysis
+5. Visualization & Analysis
 
     Matrix_plotting.py: A GUI for generating 2D intensity maps (heatmaps) and 3D stacked "offset" plots of temperature profiles.
 
     Temperature_profile_fitting.py: A "steering" script that performs simultaneous global fits across all measured temperatures, ensuring that parameters like the Debye temperature remain physically consistent across the entire dataset.
 
-5. Reproducing Figures
+6. Reproducing Figures
 
 The scripts used to generate the figures for the accompanying manuscript are located in the /Scripts directory. These scripts utilise the nussbaum library and the raw data provided in /Data. 
 
@@ -99,7 +95,9 @@ nussbaum_project/
     ├── Matrix_plotting.py
     └── utils/
         ├── __init__.py
-        ├── fold.py        # Calibration and folding logic
+        ├── hyp_mean.py
+        ├── fold.py        # Calibration and folding logic for datafiles with length of 1023 datapoints
+        ├── fold_1024.py   # Calibration and folding logic for datafiles with length of 1024 datapoints
         ├── s2n.py         # Signal-to-Noise metrics
         └── curve.py       # fitting line shapes
 
