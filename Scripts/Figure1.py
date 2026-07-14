@@ -17,14 +17,18 @@ import numpy as np
 import os
 import glob
 import pandas as pd
-from scipy.optimize import curve_fit
-from Nussbaum.utils import fold, s2n
-from Nussbaum.utils import curve as moss
 import re
 import traceback
 from datetime import datetime
 import csv
-
+import sys
+from pathlib import Path
+root_dir = Path(__file__).resolve().parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+from nussbaum.utils import fold, s2n
+from nussbaum.utils import curve as moss
+from nussbaum.utils import hyp_mean
 
 # =============================================================================
 # Spectrum functions
@@ -266,24 +270,37 @@ if file_dict_stack and velocity_stack is not None:
                 
                 plot_index += 1
 
+                #calaculate goodness-of-fit
+                chi2=calculate_single_reduced_chi2(spectrum, spectrum_fit, popt, fixed_param_count=0)
+                nrmse=calculate_single_nrmse(spectrum, spectrum_fit)
+                
+                #calaculate adjusted avergae and distribution of hyperfine field 
+                #by folding negative portion of B_hf
+                meanH,std_meanH=hyp_mean.compute_adjusted_H(popt[11],popt[13])
+                
+                plot_index += 1
+
                 # --- EXCEL DATA STORAGE ---
                 excel_data_rows.append({
                     'Temp': f"{key}K", 'temp_val': current_temp, 
                     'Phase': 'Doublet 1', 'Interp': 'Doublet 1',
                     'Rel. spec. area': frac_doublet_1,
-                    'CS': popt[1], 'QS or ε': popt[2], 'σQS or σε': popt[3], 'H': 'N/A', 'σH': 'N/A'
+                    'CS': popt[1], 'QS or ε': popt[2], 'σQS or σε': popt[3], 'H': 'N/A', 'σH': 'N/A',
+                    'chi2':chi2['reduced_chi2'],'nrmse':nrmse
                 })
                 excel_data_rows.append({
                     'Temp': f"{key}K", 'temp_val': current_temp, 
                     'Phase': 'Doublet 2', 'Interp': 'Doublet 2',
                     'Rel. spec. area': frac_doublet_2,
-                    'CS': popt[5], 'QS or ε': popt[6], 'σQS or σε': popt[7], 'H': 'N/A', 'σH': 'N/A'
+                    'CS': popt[5], 'QS or ε': popt[6], 'σQS or σε': popt[7], 'H': 'N/A', 'σH': 'N/A',
+                    'chi2':chi2['reduced_chi2'],'nrmse':nrmse
                 })
                 excel_data_rows.append({
                     'Temp': f"{key}K", 'temp_val': current_temp,
                     'Phase': 'Sextet', 'Interp': 'Sextet',
                     'Rel. spec. area': frac_sextet,
-                    'CS': popt[9], 'QS or ε': popt[10], 'σQS or σε': popt[12], 'H': popt[11], 'σH': popt[13]
+                    'CS': popt[9], 'QS or ε': popt[10], 'σQS or σε': popt[12], 'H': meanH, 'σH': std_meanH,
+                    'chi2':chi2['reduced_chi2'],'nrmse':nrmse
                 })
 
             except RuntimeError:
