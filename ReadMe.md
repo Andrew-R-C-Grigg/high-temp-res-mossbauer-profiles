@@ -29,11 +29,7 @@ Core Components & Utility Modules
 
     Folding: Converts raw drive data into folded spectra using linear regression and interpolation to ensure zero-velocity alignment.
 
-    SNR Metrics:
-
-        s2n: Standard signal-to-noise calculation.
-
-        as2n: Adjusted SNR which accounts for background levels, used as the primary trigger for temperature stepping.
+    SNR Metrics: including s2n (Standard signal-to-noise calculation) and as2n (Adjusted SNR which accounts for background levels, used as the primary trigger for temperature stepping).
 
 3. Modelling of high temperature resolution profiles (utils/curve.py)
 
@@ -63,7 +59,7 @@ Dependencies
 
     Core: numpy, scipy, matplotlib, pandas
 
-    Hardware/UI: pywinauto, comtypes, pyserial, tkinter
+    Hardware/UI: pywinauto, comtypes, pyserial, tkinter, lakeshore
 
     Fitting/Optimisation: joblib, sklearn, tqdm
 
