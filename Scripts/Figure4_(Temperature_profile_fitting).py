@@ -26,6 +26,7 @@ import time
 from datetime import datetime
 import matplotlib.animation as animation
 import pandas as pd
+from nussbaum.utils import hyp_mean
 
 from pathlib import Path
 root_dir = Path(__file__).resolve().parent.parent
@@ -1118,6 +1119,7 @@ static_opt = dict(zip(params_static, optimised_params_static))
 dynamic_opt = dict(zip(params_dynamic, optimised_params_dynamic))
 blume_opt = dict(zip(params_blume, optimised_params_blume))
 
+#add goodness-of-fit calculation
 static_opt['global_red_chi2'] = static_red_chi_sq['reduced_chi2']
 static_opt['global_nrmse'] = static_nrmse
 
@@ -1126,6 +1128,11 @@ dynamic_opt['global_nrmse'] = dynamic_nrmse
 
 blume_opt['global_red_chi2'] = blume_red_chi_sq['reduced_chi2']
 blume_opt['global_nrmse'] = blume_nrmse
+
+#add adjustment of B field for negative values
+static_opt['B_sat'],static_opt['sigma_H']=hyp_mean.compute_adjusted_H(static_opt['B_sat'],static_opt['sigma_H'])
+dynamic_opt['B_sat'],dynamic_opt['sigma_H']=hyp_mean.compute_adjusted_H(dynamic_opt['B_sat'],dynamic_opt['sigma_H'])
+blume_opt['B_sat'],blume_opt['sigma_H']=hyp_mean.compute_adjusted_H(blume_opt['B_sat'],blume_opt['sigma_H'])
 
 models_data = [
     ('xVBF',         static_opt,  fixed_parameters_static),
