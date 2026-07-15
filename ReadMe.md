@@ -67,6 +67,7 @@ Directory Structure
 
 To ensure the scripts run correctly, maintain the following structure:
 
+```text
 nussbaum_project/
 ├── LICENSE                # 
 ├── DATA_LICENSE           # CC-BY 4.0 (Data License)
