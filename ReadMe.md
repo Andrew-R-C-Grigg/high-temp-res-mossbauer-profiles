@@ -5,7 +5,7 @@ Developed at:
     Institute of Biogeochemistry and Pollutant Dynamics
     ETH Zurich, Switzerland.
 
-Available from Github in the 'high-temp-res-mossbauer-profiles' repository (https://github.com/Andrew-R-C-Grigg/high-temp-res-mossbauer-profiles
+Available from Github in the 'high-temp-res-mossbauer-profiles' repository (https://github.com/Andrew-R-C-Grigg/high-temp-res-mossbauer-profiles) and on Zenodo with the DOI 10.5281/zenodo.21366740.
 
 Publication to cite: 
     Andrew R. C. Grigg, James M. Byrne, Ruben Kretzschmar (in preparation) Collection and analysis of high temperature-resolution 57Fe Mössbauer spectroscopy for detailed iron mineral characterisation.
