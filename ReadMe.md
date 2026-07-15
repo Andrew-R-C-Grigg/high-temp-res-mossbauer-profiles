@@ -1,4 +1,4 @@
-Nussbaum: Automated Acquisition, Processing & Fitting of High-Resolution Mössbauer Spectroscopy
+Nussbaum: Automated Acquisition, Processing & Fitting of High Temperature-Resolution Mössbauer Spectroscopy
 
 Developed at: 
     Department of Environmental Systems Science 
