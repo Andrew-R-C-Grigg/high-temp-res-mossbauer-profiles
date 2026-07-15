@@ -124,9 +124,9 @@ vmax = 1.02
 
 for folder,ax,title in zip(
         [
-            "2L_Fh",
-         "2Lc_Fh",
-          "6L_Fh"
+            "6L-Fh",
+         "2L-Fh",
+          "2Lc-Fh"
          ],
         [
             ax1,
@@ -134,16 +134,16 @@ for folder,ax,title in zip(
             ax3
             ],
         [
-            "2L",
-         "2Lc",
-          "6L"
+            "6L",
+         "2L",
+          "2Lc"
          ]
         ):
     
     # Define paths
-    directory_path=f"..\Data\{folder}\profile"
+    directory_path=f"../Data/{folder}/profile"
     pattern = r"\d+\.\d+K"  
-    calfile = glob.glob(f"..\{folder}\*_v12.dat")
+    calfile = glob.glob(f"../Data/{folder}/*_v12.dat")
     
     # Load the data
     spectra, velocity= load_files(directory_path, pattern, calfile[0])
