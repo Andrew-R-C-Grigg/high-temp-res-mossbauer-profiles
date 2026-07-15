@@ -66,7 +66,6 @@ Dependencies
 Directory Structure
 
 To ensure the scripts run correctly, maintain the following structure:
-Plaintext
 
 nussbaum_project/
 ├── LICENSE                # 
