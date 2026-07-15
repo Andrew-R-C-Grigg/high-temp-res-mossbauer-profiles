@@ -71,12 +71,12 @@ def load_files(file_paths, calfile_path):
 # SECTION 2: PATH SETUP & EXECUTION
 # =============================================================================
 
-base_path = r"..\Data\Fh-Gt_mix\"
+base_path = r"../Data/Fh-Gt_mix/"
 MATRIX_DATA_FOLDER = os.path.join(base_path, "profile")
 CALIBRATION_FILE_PATH = os.path.join(base_path, "251104_v12.dat") 
 
 # --- Load Data ---
-print(f"Loading matrix data from: {MATRIX_DATA_FOLDER}")
+print("Loading matrix data from: {MATRIX_DATA_FOLDER}")
 matrix_files = glob.glob(os.path.join(MATRIX_DATA_FOLDER, "*.dat"))
 file_dict_matrix, velocity_matrix = load_files(matrix_files, CALIBRATION_FILE_PATH)
 
