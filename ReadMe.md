@@ -97,6 +97,8 @@ nussbaum_project/
         ├── s2n.py         # Signal-to-Noise metrics
         └── curve.py       # fitting line shapes
 
+```
+
 Usage
 
     Calibrate: Ensure you have a .dat (or .txt) calibration file.
