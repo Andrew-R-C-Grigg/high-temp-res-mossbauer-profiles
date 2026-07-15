@@ -13,7 +13,7 @@ Publication to cite:
 
 Overview
 
-Nussbaum is a Python package designed for the entire lifecycle of high temperature-resolution Mössbauer temperature profile experiments. It automates hardware control for automated profile measurements and provides a mathematical framework for data reduction (folding/calibration) and physics-based modelling simultaneously in energy and temperature domains.
+Nussbaum is a Python package designed for the entire lifecycle of high temperature-resolution Mössbauer temperature profile experiments. It automates hardware control for automated profile measurements, provides a mathematical framework for data treatment and offers three protocols for fitting all spectra simultaneously in energy and temperature domains.
 
 Core Components & Utility Modules
 
